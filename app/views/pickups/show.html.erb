@@ -1,0 +1,30 @@
+<h6> Your secure message</h6>
+
+<h4>
+  From:
+  <%= @message.sender %>
+</h4>
+<h4>
+  To:
+  <%= @message.recipient %>
+</h4>
+
+<p>
+  <%= @message.body %>
+</p>
+
+<%= form_for @reply, html: {class: 'ink-form'} do |f| %>
+  <%= f.hidden_field :sender %>
+  <%= f.hidden_field :recipient %>
+  <div class="control-group">
+    <%= f.label :body, "Reply" %>
+    <div class="control">
+      <%= f.text_area :body %>
+    </div>
+  </div>
+  <div class="control-group column-group">
+    <div class="control all-20">
+      <%= f.submit "Send" %>
+    </div>
+  </div>
+<% end %>

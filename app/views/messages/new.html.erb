@@ -1,0 +1,41 @@
+<div class="alert"><%= flash[:message]%></div>
+
+<h2>New Message</h2>
+
+<%= form_for @message, html: {class: 'ink-form all-50 small-100 tiny-100'} do |f| %>
+
+  <div class="control-group required">
+    <%= f.label :sender %>
+    <div class="control">
+      <%= f.text_field :sender %>
+      <% if @message.errors[:sender] %>
+        <p class="tip error"><%= @message.errors[:sender].join(", ") %></p>
+      <% end %>
+    </div>
+  </div>
+
+
+  <div class="control-group required">
+    <%= f.label :recipient %>
+    <div class="control">
+      <%= f.text_field :recipient %>
+      <% if @message.errors[:recipient] %>
+        <p class="tip error"><%= @message.errors[:recipient].join(", ") %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="control-group required">
+    <%= f.label :body %>
+    <div class="control">
+      <%= f.text_area :body %>
+    </div>
+  </div>
+  <div class="control-group column-group">
+    <div class="control all-80">&nbsp;
+    </div>
+    <div class="control all-20">
+      <%= f.submit "Send", class: 'ink-button' %>
+    </div>
+  </div>
+<% end %>
