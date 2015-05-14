@@ -8,9 +8,11 @@ but the goal of easycomm is primarily to contain clear, easy to understand code.
 
 # Setup
 
-- Install Ruby version 2.2.2
+- Install Ruby version 2.2.2 (on windows, use version 2.0.x or 2.1)
 
 - Install git
+
+- Install Postgresql
 
 - Clone this repository
 
