@@ -39,7 +39,7 @@ recipient fields for your message, you should be able to send a text message to 
 
 # Submission
 
-- You have been granted access to an individual bitbucket repository. If you do not complete the challenge within 1 week, your access may expire.  Please contact us if you need additonal time.
+- You have been granted access to an individual bitbucket repository. If you do not complete the challenge within your allotted time, your access may expire.  Please contact us if you need additonal time.
 
 - As you work on the challenge, commit your work to a branch other than master.  You can create and start work on a new branch with `git checkout -b your_branch_name`
 
@@ -57,4 +57,3 @@ recipient fields for your message, you should be able to send a text message to 
 - [Twilio API docs](https://www.twilio.com/docs/api/rest/sending-messages)
 - [Configuring your keys](http://richonrails.com/articles/the-rails-4-1-secrets-yml-file)
 - [First time on Rails?](https://www.railstutorial.org/book)
-
