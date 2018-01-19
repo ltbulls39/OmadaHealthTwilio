@@ -6,12 +6,15 @@ class MessageCreator
 
   def initialize(params)
     @message = Message.new(allowed_params(params))
+    account_sid = ENV["TWILIO_ACCOUNT_SID"]
+    auth_token = ENV["TWILIO_AUTH_TOKEN"]
+    @client = Twilio::REST::Client.new(account_sid, auth_token)
   end
 
   def ok?
     save_message && send_notification
   end
-
+=begin
   def check_digits(strings)
     if strings[0] == "+"
       seq = strings.reverse.chop.reverse
@@ -22,7 +25,7 @@ class MessageCreator
       return false
     end 
   end
-
+=end
   def is_it_email?
     if @message.sender_message.include? "@"
       return "email"
@@ -31,6 +34,7 @@ class MessageCreator
     end
   end
 
+=begin
   def is_it_text?
     if check_digits(@message.sender_message) && check_digits(@message.recipient_message)
       return "sms"
@@ -53,9 +57,9 @@ class MessageCreator
       return num      
     end
   end
-
+=end
   def clean_number2(num)
-    number = num.scan(/\d+/).join
+    number = num.scan(/\d/).join
     number[0] == "1" ? number[0] = '' : number
     number unless number.length != 10
   end
@@ -65,25 +69,19 @@ class MessageCreator
   def send_notification
     if is_it_email? == "email"
       MessageMailer.secure_message(@message).deliver_now
-    elsif is_it_text? == "sms"
+    else
       #from_texter = @message.sender_message
       #to_texter = @message.recipient_message
 
       from_texter = "+1" + clean_number2(@message.sender_message)
       to_texter = "+1" + clean_number2(@message.recipient_message)
       begin
-        #account_sid = ENV["TWILIO_ACCOUNT_SID"]
-        #auth_token = ENV["TWILIO_AUTH_TOKEN"]
-        account_sid = ENV["TWILIO_ACCOUNT_SID"]
-        auth_token = ENV["TWILIO_AUTH_TOKEN"]
-        @client = Twilio::REST::Client.new(account_sid, auth_token)
-        @sms_record = @client.messages.create(
+        @sms_record = @client.account.messages.create(
           :from => from_texter,
           :to => to_texter,
-          :body => @message.body
+          :body => @message.secure_id
         )
-      rescue StandardError => e
-        p "we got an error"
+      rescue Twilio::REST::RequestError => e
         puts e.message
       end
     end

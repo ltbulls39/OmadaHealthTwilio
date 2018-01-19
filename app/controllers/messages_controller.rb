@@ -10,6 +10,7 @@ class MessagesController < ApplicationController
       redirect_to new_message_path
     else
       @message = action.message
+      flash[:message] = "Message not sent"      
       render :new
     end
   end
