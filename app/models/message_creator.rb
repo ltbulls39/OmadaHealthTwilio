@@ -6,8 +6,8 @@ class MessageCreator
 
   def initialize(params)
     @message = Message.new(allowed_params(params))
-    account_sid = ENV["TWILIO_ACCOUNT_SID"]
-    auth_token = ENV["TWILIO_AUTH_TOKEN"]
+    account_sid = ENV["TWILIO_TEST_ACCOUNT_SID"]
+    auth_token = ENV["TWILIO_TEST_AUTH_TOKEN"]
     @client = Twilio::REST::Client.new(account_sid, auth_token)
   end
 
@@ -28,9 +28,13 @@ class MessageCreator
 =end
   def is_it_email?
     if @message.sender_message.include? "@"
-      return "email"
-    else 
-      return "not email"
+      if @message.recipient_message.include? "@"
+        @message.sender_email = @message.sender_message
+        @message.save
+        @message.recipient_email = @message.recipient_message
+        @message.save
+        return "email"
+      end
     end
   end
 
@@ -59,7 +63,7 @@ class MessageCreator
   end
 =end
   def clean_number2(num)
-    number = num.scan(/\d/).join
+    number = num.scan(/\d+/).join
     number[0] == "1" ? number[0] = '' : number
     number unless number.length != 10
   end
@@ -72,9 +76,13 @@ class MessageCreator
     else
       #from_texter = @message.sender_message
       #to_texter = @message.recipient_message
+      @message.sender_phone = @message.sender_message
+      @message.save
+      @message.recipient_phone = @message.recipient_message
+      @message.save
 
-      from_texter = "+1" + clean_number2(@message.sender_message)
-      to_texter = "+1" + clean_number2(@message.recipient_message)
+      from_texter = "+1" + clean_number2(@message.sender)
+      to_texter = "+1" + clean_number2(@message.recipient)
       begin
         @sms_record = @client.account.messages.create(
           :from => from_texter,
