@@ -5,6 +5,7 @@ class MessageCreator
   attr_accessor :message, :sms_record
 
   def initialize(params)
+    # Creates new message with allowed parameters
     @message = Message.new(allowed_params(params))
     account_sid = ENV["TWILIO_TEST_ACCOUNT_SID"]
     auth_token = ENV["TWILIO_TEST_AUTH_TOKEN"]
@@ -14,21 +15,10 @@ class MessageCreator
   def ok?
     save_message && send_notification
   end
-=begin
-  def check_digits(strings)
-    if strings[0] == "+"
-      seq = strings.reverse.chop.reverse
-      seq.scan(/\D/).empty?
-    elsif strings.include?("+") ? false : true
-      strings.scan(/\D/).empty?
-    else 
-      return false
-    end 
-  end
-=end
-  def is_it_email?
+
+  def is_it_email?  # Checks to see if it is an email or a text
     if @message.sender_message.include? "@"
-      if @message.recipient_message.include? "@"
+      if @message.recipient_message.include? "@" # Checks both sender and recipient fields
         @message.sender_email = @message.sender_message
         @message.save
         @message.recipient_email = @message.recipient_message
@@ -38,31 +28,7 @@ class MessageCreator
     end
   end
 
-=begin
-  def is_it_text?
-    if check_digits(@message.sender_message) && check_digits(@message.recipient_message)
-      return "sms"
-    end
-    return "not sms"
-  end
-
-  def clean_number(num)
-    if num.length == 12 && num[0] == "+" && check_digits(num)
-      return num
-    end
-
-    if num.length == 11 && check_digits(num)
-      num = "+" + num
-      return num
-    end
-
-    if num.length == 10 && check_digits(num)
-      num = "+1" + num
-      return num      
-    end
-  end
-=end
-  def clean_number2(num)
+  def clean_number(num) # Cleans the number into Twilio API format and returns it
     number = num.scan(/\d+/).join
     number[0] == "1" ? number[0] = '' : number
     number unless number.length != 10
@@ -71,19 +37,18 @@ class MessageCreator
   private
 
   def send_notification
+    # If email send email notification
     if is_it_email? == "email"
       MessageMailer.secure_message(@message).deliver_now
-    else
-      #from_texter = @message.sender_message
-      #to_texter = @message.recipient_message
+    else  # If text send text notification
       @message.sender_phone = @message.sender_message
       @message.save
       @message.recipient_phone = @message.recipient_message
       @message.save
-
-      from_texter = "+1" + clean_number2(@message.sender)
-      to_texter = "+1" + clean_number2(@message.recipient)
-      begin
+      # Ensures the number is in correct format
+      from_texter = "+1" + clean_number(@message.sender)
+      to_texter = "+1" + clean_number(@message.recipient)
+      begin # Error handling, in case the text won't work
         @sms_record = @client.account.messages.create(
           :from => from_texter,
           :to => to_texter,
@@ -95,13 +60,13 @@ class MessageCreator
     end
   end
 
-  def save_message
+  def save_message  # Saves the message with an encrypted message
     @message.secure_id = SecureRandom.urlsafe_base64(25)
     @message.save
   end
 
   def allowed_params(params)
-    {
+    { # Params that a message can have
       sender_message: params[:message][:sender], 
       recipient_message: params[:message][:recipient], 
       body: params[:message][:body]
