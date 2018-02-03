@@ -12,8 +12,8 @@ describe PickupsController do
     it "sets up a reply" do
       subject
       expect(assigns[:reply]).to be_a(Message)
-      expect(assigns[:reply].sender).to eq(message.recipient)
-      expect(assigns[:reply].recipient).to eq(message.sender)
+      expect(assigns[:reply].sender_message).to eq(message.recipient)
+      expect(assigns[:reply].recipient_message).to eq(message.sender)
     end
   end
 end
